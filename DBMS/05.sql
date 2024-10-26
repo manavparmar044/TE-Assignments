@@ -47,9 +47,26 @@ DECLARE clss VARCHAR(25);
 DECLARE studMarks INT;
 DECLARE student_id INT;
 
-SELECT s_id,marks INTO student_id,studMarks FROM Stud_Marks WHERE s_name = stud_name
+SELECT s_id,marks INTO student_id,studMarks FROM Stud_Marks WHERE s_name = stud_name;
 
 IF student_id IS NULL THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Student not found';
 ELSE 
     set clss:= classify(studMarks);
+    INSERT INTO Result (r_id,category,s_id) VALUES (roll,clss,student_id);
+END IF;
+END $$
+DELIMITER ;
+
+CALL proc_grade('Alice', 1);
+CALL proc_grade('Bob', 2);
+CALL proc_grade('Charlie', 3);
+CALL proc_grade('David', 4);
+CALL proc_grade('Eve', 5);
+CALL proc_grade('Frank', 6);
+CALL proc_grade('Grace', 7);
+CALL proc_grade('Hannah', 8);
+CALL proc_grade('Isaac', 9);
+CALL proc_grade('Judy', 10);
+
+SELECT * FROM Result;
