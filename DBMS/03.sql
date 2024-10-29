@@ -78,7 +78,7 @@ JOIN PlacementDrive p ON s.Drive_id = p.Drive_id;
 
 SELECT s.s_name,s.s_branch
 FROM Student s
-JOIN PlacementDrive p ON S.Drive_id = P.Drive_id
+JOIN PlacementDrive p ON s.Drive_id = p.Drive_id
 WHERE p.package = 500000;
 
 --List all student names and Pcompany_name for training fees more than 20000.
@@ -135,6 +135,7 @@ INSERT INTO StudentCGPAView (s_name, CGPA)
 VALUES ('Eve', 7.5);
 
 SELECT * FROM StudentCGPAView;
+
 UPDATE StudentCGPAView
 SET CGPA = 8.8
 WHERE s_name = 'Alice';

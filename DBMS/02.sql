@@ -112,7 +112,7 @@ WHERE CGPA BETWEEN 7 AND 9;
 
 --Display all Student names with T_id in decreasing order of Fees.
 
-SELECT s_name,Student.t_id,T_Fee
+SELECT s_name,Student.T_id,T_Fee
 FROM Student
 JOIN Training on Student.T_id = Training.T_id
 ORDER BY T_Fee DESC;

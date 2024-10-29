@@ -18,7 +18,7 @@ db.students.insertMany([
 //Average marks by department
 
 db.students.aggregate([
-    {$group: {_id: "$department",averageMaeks: {$avg: "$marks"}}}
+    {$group: {_id: "$department",averageMarks: {$avg: "$marks"}}}
 ]);
 
 //Highest marks in each department
