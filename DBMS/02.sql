@@ -19,7 +19,7 @@ CREATE TABLE Student(
     s_name VARCHAR(50),
     CGPA DECIMAL(3,2),
     s_branch VARCHAR(50),
-    S_dob DATE,
+    s_dob DATE,
     FOREIGN KEY (Drive_id) REFERENCES PlacementDrive(Drive_id) ON DELETE CASCADE,
     FOREIGN KEY (T_id) REFERENCES Training(T_id) ON DELETE CASCADE
 );

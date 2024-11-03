@@ -29,23 +29,30 @@ db.student_count_by_department.find()
 
 //Average Marks
 
-var mapFunction = function(){
-    emit(this.department,this.marks)
-}
+var mapFunction = function() { emit(this.department, this.marks); };
 
-var reduceFunction = function(key,values){
-    var sum = 0;
-    for(var i = 0;i<values.length;i++){
-        sum+=values[i];
-        return sum/values.length;
+var reduceFunction = function(key, values) {
+    var sum = Array.sum(values);
+    return sum / values.length; // Calculate the average
+};
+
+// Query for "Physics" department only
+db.students.mapReduce(
+    mapFunction,
+    reduceFunction,
+    {
+        out: "average_marks",
+        query: { department: "Physics" }
     }
-}
+);
 
-//Query
+db.average_marks.find();
 
-db.students.mapReduce(mapFunction,reduceFunction,{
-    out: "average_marks",
-    query: {department: "Physics"}
-});
+// Calculate average for all departments
+db.students.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: "average_marks_all" }
+);
 
-// db.students.mapReduce(mapFunction,reduceFunction,{out: "average_marks_all"});
+db.average_marks_all.find();
