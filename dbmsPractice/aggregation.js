@@ -40,6 +40,22 @@ db.students.aggregate([
     {$project: {name: 1,department: 1,marks: 1,_id: 0}}
 ]);
 
+//Sort
+
+db.students.aggregate([
+    {$sort: {age: 1}}
+]);
+
 db.students.createIndex({name: 1});
 db.students.createIndex({name: 1,department: 1});
 // db.students.createIndex({name: 1},{unique: true});
+
+db.createCollection("unwindExample");
+db.unwindExample.insertMany([
+    { name: "Alice", subjects: ["Math", "Physics", "Chemistry"] },
+    { name: "Bob", subjects: ["Biology", "Chemistry"] },
+    { name: "Charlie", subjects: ["Math", "Computer Science"] }
+]);
+db.unwindExample.aggregate([
+    {$unwind: "$subjects"}
+]);

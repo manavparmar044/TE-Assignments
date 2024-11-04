@@ -111,3 +111,13 @@ db.footballers.insertMany([
      { $sort: { avgDribblingRating: -1 } },
       { $limit: 1 }
     ]);
+
+    db.createCollection("unwindExample");
+    db.unwindExample.insertMany([
+        { name: "Alice", subjects: ["Math", "Physics", "Chemistry"] },
+        { name: "Bob", subjects: ["Biology", "Chemistry"] },
+        { name: "Charlie", subjects: ["Math", "Computer Science"] }
+    ]);
+    db.unwindExample.aggregate([
+        {$unwind: "$subjects"}
+    ]);
