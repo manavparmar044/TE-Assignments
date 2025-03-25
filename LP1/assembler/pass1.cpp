@@ -1,48 +1,47 @@
-#include<iostream>
-#include<fstream>
-#include<string>
-#include<sstream>
-#include<fstream>
-#include<cstdlib>
+#include <iostream>
+#include <fstream>   // For file handling
+#include <string>    // For using strings
+#include <sstream>   // For using stringstream
+#include <cstdlib>   // For using stoi
 using namespace std;
 
-struct OPTab{
+struct OPtab{
     string opcode;
     string mclass;
     string mnemonic;
 };
 
-struct OPTab optab[18] = {
-    {"STOP","IS",00},
-    {"ADD","IS",00},
-    {"SUB","IS",00},
-    {"MULT","IS",00},
-    {"MOVER","IS",00},
-    {"MOVEM","IS",00},
-    {"COMP","IS",00},
-    {"BC","IS",00},
-    {"DIV","IS",00},
-    {"READ","IS",00},
-    {"PRINT","IS",00},
-    {"START","AD",00},
-    {"END","AD",00},
-    {"ORIGIN","AD",00},
-    {"EQU","AD",00},
-    {"LTORG","AD",00},
-    {"DC","AD",00},
-    {"DL","AD",00},
-};
+struct OPtab optab[18] = {
+    {"STOP", "IS", "00"},
+    {"ADD", "IS", "01"},
+    {"SUB", "IS", "02"},
+    {"MULT", "IS", "03"},
+    {"MOVER", "IS", "04"},
+    {"MOVEM", "IS", "05"},
+    {"COMP", "IS", "06"},
+    {"BC", "IS", "07"},
+    {"DIV", "IS", "08"},
+    {"READ", "IS", "09"},
+    {"PRINT", "IS", "10"},
+    {"START", "AD", "01"},
+    {"END", "AD", "02"},
+    {"ORIGIN", "AD", "03"},
+    {"EQU", "AD", "04"},
+    {"LTORG", "AD", "05"},
+    {"DC", "DL", "01"},
+    {"DS", "DL", "02"}};
 
 int getOP(string s){
-    for(int i = 0;i<18;i++){
-        if(optab[i].opcode == s){
+    for (int i = 0; i < 18; ++i){
+        if (optab[i].opcode == s)
             return i;
-        }
     }
     return -1;
 }
 
-int getRegID(string s){
+// Function to fetch the register code
+int getRegID(string s)
+{
     if (s == "AREG")
         return 1;
     else if (s == "BREG")
@@ -55,7 +54,9 @@ int getRegID(string s){
         return (-1);
 }
 
-int getConditionalCode(string s){
+// Function to fetch conditional code
+int getConditionCode(string s)
+{
     if (s == "LT")
         return 1;
     else if (s == "LE")
@@ -72,7 +73,9 @@ int getConditionalCode(string s){
         return (-1);
 }
 
-struct symTable{
+// To store Symbol Table output
+struct symTable
+{
     int no;
     string sname;
     string addr;
@@ -80,25 +83,31 @@ struct symTable{
 
 struct symTable ST[10];
 
-bool presentST(string s){
-    for(int i = 0;i<10;i++){
-        if(ST[i].sname == s){
+// Function to check presence of a particular 'symbol'
+bool presentST(string s)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        if (ST[i].sname == s)
             return true;
-        }
     }
     return false;
 }
 
-int getSymID(string s){
-    for(int i = 0;i<10;i++){
-        if(ST[i].sname == s){
+// Function to fetch the symbol entry
+int getSymID(string s)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        if (ST[i].sname == s)
             return i;
-        }
     }
-    return -1;
+    return (-1);
 }
 
-struct litTable{
+// To store Literal Table output
+struct litTable
+{
     int no;
     string lname;
     string addr;
@@ -106,68 +115,270 @@ struct litTable{
 
 struct litTable LT[10];
 
-bool presentLT(string s){
-    for(int i = 0;i<10;i++){
-        if(LT[i].lname == s){
+// Function to check presence of a particular 'literal'
+bool presentLT(string s)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        if (LT[i].lname == s)
             return true;
-        }
     }
     return false;
 }
 
-int getLitID(string s){
-    for(int i = 0;i<10;i++){
-        if(LT[i].lname == s){
+// Function to fetch the literal entry
+int getLitID(string s)
+{
+    for (int i = 0; i < 10; ++i)
+    {
+        if (LT[i].lname == s)
             return i;
-        }
     }
-    return -1;
+    return (-1);
 }
 
-struct poolTable{
+// To store Pool Table output
+struct poolTable
+{
     int no;
-    string pname;
-    string addr;
+    string lno;
 };
 
 struct poolTable PT[10];
 
-int main(){
+int main()
+{
     ifstream fin;
+    // input assembly code file
+    // empty space (eg. no operand2 / no label) is denoted by "NAN"
     fin.open("input.txt");
-    ofstream ic,st,lt;
-    const char *path1 = "ic.txt";
-    const char *path2 = "st.txt";
-    const char *path3 = "lt.txt";
+
+    ofstream ic, st, lt;
+    // Saving the output of pass1 into pass2 source code directory. Since it will be the input for pass2.cpp
+    // The paths may change accordingly
+    const char *path1 = "ic.txt"; // empty space is filled with "NAN"
+    const char *path2 = "sym_table.txt";
+    const char *path3 = "lit_table.txt";
     ic.open(path1);
     st.open(path2);
     lt.open(path3);
-    int scnt = 0;
-    int lcnt = 0;
-    int pcnt = 0;
-    int LC = 0;
-    int nlcnt = 0;
-    string label,opcode,op1,op2;
+    string label, opcode, op1, op2;
+    int scnt = 0, lcnt = 0, nlcnt = 0, pcnt = 0, LC = 0;
 
-    while(!fin.eof()){
-        fin>>label>>opcode>>op1>>op2;
+    while (!fin.eof())
+    {
+        fin >> label >> opcode >> op1 >> op2; // reading the assembly code line by line
         int id;
-        string IC,lc;
-        id = getOP(opcode);
-        IC = "("+optab[id].mclass+","+optab[id].mnemonic+") ";
+        string IC, lc; // lc - LC processing, IC - Intermediate code
 
-        if(opcode == "START"){
+        id = getOP(opcode); // fetch the opcode entry
+        IC = "(" + optab[id].mclass + "," + optab[id].mnemonic + ") ";
+
+        // Individual cases for Assembly Directives (AD) - START, END, ORIGIN, EQU, LTORG
+        // no LC processing for AD so lc = "---"
+        if (opcode == "START")
+        {
             lc = "---";
-            if(op1!="NAN"){
+            if (op1 != "NAN")
+            {
                 LC = stoi(op1);
-                IC+="(C,"+op1+") NAN";
+                IC += "(C," + op1 + ") NAN";
             }
         }
-        if(opcode == "EQU"){
+
+        if (opcode == "EQU")
+        {
             lc = "---";
-            IC+="NAN NAN";
-            if(presentST(label)){}
+            IC += " NAN NAN";
+            if (presentST(label))
+            {
+                ST[getSymID(label)].addr = ST[getSymID(op1)].addr;
+            }
+            else
+            {
+                ST[scnt].no = scnt + 1;
+                ST[scnt].sname = label;
+                ST[scnt].addr = ST[getSymID(op1)].addr;
+                scnt++;
+            }
         }
+
+        else if (label != "NAN")
+        {
+            if (presentST(label))
+            {
+                ST[getSymID(label)].addr = to_string(LC);
+            }
+            else
+            {
+                ST[scnt].no = scnt + 1;
+                ST[scnt].sname = label;
+                ST[scnt].addr = to_string(LC);
+                scnt++;
+            }
+        }
+
+        if (opcode == "ORIGIN")
+        {
+            string token1, token2;
+            char op;
+            stringstream ss(op1);
+            size_t found = op1.find('+');
+            if (found != string::npos)
+                op = '+';
+            else
+                op = '-';
+            getline(ss, token1, op);
+            getline(ss, token2, op);
+            lc = "---";
+            if (op == '+')
+            {
+                LC = stoi(ST[getSymID(token1)].addr) + stoi(token2);
+                IC += "(S,0" + to_string(ST[getSymID(token1)].no) + ")+" + token2 + " NAN";
+            }
+            else
+            {
+                LC = stoi(ST[getSymID(token1)].addr) - stoi(token2);
+                IC += "(S,0" + to_string(ST[getSymID(token1)].no) + ")-" + token2 + " NAN";
+            }
+        }
+
+        if (opcode == "LTORG")
+        {
+            cout << " " << label << "\t" << opcode << "\t" << op1 << "\t" << op2 << "\t";
+            for (int i = lcnt - nlcnt; i < lcnt; ++i)
+            {
+                lc = to_string(LC);
+                IC = "(DL,01) (C,";
+                string c(1, LT[i].lname[2]);
+                IC += c + ") NAN";
+                LT[i].addr = to_string(LC);
+                LC++;
+                if (i < lcnt - 1)
+                    cout << lc << "\t" << IC << "\n\t\t\t\t";
+                else
+                    cout << lc << "\t" << IC << endl;
+                ic << lc << "\t" << IC << endl;
+            }
+            // managing pool table in LTORG
+            PT[pcnt].lno = "#" + to_string(LT[lcnt - nlcnt].no);
+            PT[pcnt].no = pcnt + 1;
+            pcnt++;
+            nlcnt = 0;
+            continue;
+        }
+
+        if (opcode == "END")
+        {
+            lc = "---";
+            IC += " NAN NAN";
+            cout << " " << label << "\t" << opcode << "\t" << op1 << "\t" << op2 << "\t" << lc << "\t" << IC << endl;
+            ic << lc << "\t" << IC << endl;
+            if (nlcnt)
+            {
+                for (int i = lcnt - nlcnt; i < lcnt; ++i)
+                {
+                    lc = to_string(LC);
+                    IC = "(DL,01) (C,";
+                    string c(1, LT[i].lname[2]);
+                    IC += c + ") NAN";
+                    LT[i].addr = to_string(LC);
+                    LC++;
+                    cout << "\t\t\t\t" << lc << "\t" << IC << endl;
+                    ic << lc << "\t" << IC << endl;
+                }
+                // managing pool table after END (if any literals are left)
+                PT[pcnt].lno = "#" + to_string(LT[lcnt - nlcnt].no);
+                PT[pcnt].no = pcnt + 1;
+                pcnt++;
+            }
+            break;
+        }
+
+        // Declarative Statements (DL)
+        if (opcode == "DC" || opcode == "DS")
+        {
+            lc = to_string(LC);
+            if (opcode == "DS")
+            {
+                IC += "(C," + op1 + ") NAN";
+                LC += stoi(op1);
+            }
+            else
+            {
+                string c(1, op1[1]);
+                IC += "(C," + c + ")";
+                LC++;
+            }
+        }
+
+        // if not AD or DL then, Imperative Statements (IS)
+        if (opcode != "START" && opcode != "END" && opcode != "ORIGIN" && opcode != "EQU" && opcode != "LTORG" && opcode != "DC" && opcode != "DS")
+        {
+            if (op2 == "NAN")
+            {
+                if (op1 == "NAN")
+                {
+                    lc = to_string(LC);
+                    LC++;
+                    IC += " NAN NAN";
+                }
+                else
+                {
+                    if (presentST(op1))
+                    {
+                        IC += "(S,0" + to_string(ST[getSymID(op1)].no) + ")";
+                        lc = to_string(LC);
+                        LC++;
+                    }
+                    else
+                    {
+                        ST[scnt].no = scnt + 1;
+                        ST[scnt].sname = op1;
+                        scnt++;
+                        IC += "(S,0" + to_string(ST[getSymID(op1)].no) + ")";
+                        lc = to_string(LC);
+                        LC++;
+                    }
+                }
+            }
+            else
+            {
+                if (opcode == "BC")
+                    IC += "(" + to_string(getConditionCode(op1)) + ") ";
+                else
+                    IC += "(" + to_string(getRegID(op1)) + ") ";
+
+                if (op2[0] == '=') // operand2 is a literal
+                {
+                    LT[lcnt].no = lcnt + 1;
+                    LT[lcnt].lname = op2;
+                    lcnt++;
+                    nlcnt++;
+                    IC += "(L,0" + to_string(LT[getLitID(op2)].no) + ")";
+                }
+                else // operand2 is a symbol
+                {
+                    if (presentST(op2))
+                    {
+                        IC += "(S,0" + to_string(ST[getSymID(op2)].no) + ")";
+                    }
+                    else
+                    {
+                        ST[scnt].no = scnt + 1;
+                        ST[scnt].sname = op2;
+                        scnt++;
+                        IC += "(S,0" + to_string(ST[getSymID(op2)].no) + ")";
+                    }
+                }
+                lc = to_string(LC);
+                LC++;
+            }
+        }
+
+        // console output
+        cout << " " << label << "\t" << opcode << "\t" << op1 << "\t" << op2 << "\t" << lc << "\t" << IC << endl;
+        ic << lc << "\t" << IC << endl;
     }
     return 0;
 }

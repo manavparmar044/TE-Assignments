@@ -1,0 +1,4 @@
+(IS,MOVER) AREG
+(IS,SUB) AREG
+(DL,01) 1
+(DL,01) 1

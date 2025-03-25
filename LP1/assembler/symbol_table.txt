@@ -1,0 +1,16 @@
+    Symbol   Address
+         A         2
+       ADD         1
+         B         3
+      BACK         3
+        BC         2
+       END         4
+      LAST         2
+      LOOP         0
+     LTORG         1
+     MOVEM         0
+     MOVER         1
+      MULT         2
+      NEXT         1
+    ORIGIN         2
+     START         0

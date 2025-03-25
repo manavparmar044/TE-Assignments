@@ -29,9 +29,9 @@ int fifoPageReplacement(vector<int> pages, int n, int capacity)
 }
 
 int main(){
-    vector<int> pages = {1, 3, 0, 3, 5, 6, 3};
+    vector<int> pages = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2};
     int n = sizeof(pages)/sizeof(pages[0]);
-    int capacity = 3;
+    int capacity = 4;
     cout << "Page sequence: ";
     for (int i = 0; i < n; i++) {
         cout << pages[i] << " ";
