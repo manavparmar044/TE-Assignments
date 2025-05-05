@@ -19,6 +19,7 @@ pair<int, vector<Job>> greedyJobScheduling(vector<Job>& jobs) {
 
   int current_time = 0;
   vector<Job> scheduled_jobs;
+  
   int total_profit = 0;
 
   for (Job& job : jobs) {
@@ -38,7 +39,9 @@ int main() {
   pair<int, vector<Job>> result = greedyJobScheduling(jobs);
 
   cout << "Total profit earned: " << result.first << endl;
+
   cout << "Scheduled jobs: \n";
+
   for (Job& job : result.second) {
     cout << "Processing time: " << job.processing_time << ", Profit: " << job.profit << ", Deadline: " << job.deadline << endl;
   }
